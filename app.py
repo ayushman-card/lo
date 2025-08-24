@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for
+from flask import Flask, render_template, request, send_from_directory, redirect
 import os
 import subprocess
 from werkzeug.utils import secure_filename
 
+app = Flask(__name__)
+
 UPLOAD_FOLDER = 'uploads'
 ENHANCED_FOLDER = 'enhanced'
-ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
+ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv'}
 
-app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ENHANCED_FOLDER'] = ENHANCED_FOLDER
 
@@ -18,7 +19,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def enhance_video(input_path, output_path):
-    # Simulated enhancement using FFmpeg scaling (e.g., 720p to 1080p)
+    # Simulate enhancement: upscale to 1080p using ffmpeg
     command = [
         'ffmpeg', '-i', input_path,
         '-vf', 'scale=1920:1080',
@@ -35,20 +36,7 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_video():
     if 'video' not in request.files:
-        return redirect(request.url)
+        return redirect('/')
     file = request.files['video']
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        input_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        output_path = os.path.join(app.config['ENHANCED_FOLDER'], f"enhanced_{filename}")
-        file.save(input_path)
-        enhance_video(input_path, output_path)
-        return render_template('result.html', filename=f"enhanced_{filename}")
-    return "Invalid file format"
-
-@app.route('/download/<filename>')
-def download_file(filename):
-    return send_from_directory(app.config['ENHANCED_FOLDER'], filename, as_attachment=True)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        filename = secure_filename_
